@@ -1,0 +1,61 @@
+service: serverless-workshop-part-1
+
+plugins:
+  - serverless-s3-sync
+
+provider:
+  name: aws
+  runtime: ruby2.5
+
+  stage: dev
+  region: eu-central-1
+
+  tracing:
+    lambda: true
+
+functions:
+  temperature:
+    handler: handler.temperature
+    events:
+    - http:
+        path: temperature
+        method: get
+
+custom:
+  siteName: serverless-workshop-s3-bucket
+
+  s3Sync:
+    - bucketName: ${self:custom.siteName}
+      localDir: static
+
+resources:
+  Resources:
+    StaticSite:
+      Type: AWS::S3::Bucket
+      Properties:
+        AccessControl: PublicRead
+        BucketName: ${self:custom.siteName}
+        WebsiteConfiguration:
+          IndexDocument: index.html
+    StaticSiteS3BucketPolicy:
+      Type: AWS::S3::BucketPolicy
+      Properties:
+        Bucket:
+          Ref: StaticSite
+        PolicyDocument:
+          Statement:
+            - Sid: PublicReadGetObject
+              Effect: Allow
+              Principal: "*"
+              Action:
+              - s3:GetObject
+              Resource:
+                Fn::Join: [
+                  "", [
+                    "arn:aws:s3:::",
+                    {
+                      "Ref": "StaticSite"
+                    },
+                    "/*"
+                  ]
+                ]
