@@ -155,3 +155,43 @@ functions:
 ```
 docker run --rm -it -v $PWD:/var/gem_build -w /var/gem_build lambci/lambda:build-ruby2.5 bundle install --path=.
 ```
+
+## Part 8
+* That are some bad response times. Lets fix this through DynamoDB.
+* Add table
+```
+    weatherTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: weatherTable
+        AttributeDefinitions:
+          - AttributeName: locationId
+            AttributeType: N
+        KeySchema:
+          - AttributeName: locationId
+            KeyType: HASH
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+```
+* Fill table with one value manually through AWS Cli
+* Refactor method to use dynamodb tables instead of api. See part-8 handler.rb
+* Add dynamodb gem into Gemfile
+```
+gem 'aws-sdk-dynamodb'
+```
+* Install locally gems
+```
+bundle --no-deployment 
+```
+* Update gem layer
+```
+docker run --rm -it -v $PWD:/var/gem_build -w /var/gem_build lambci/lambda:build-ruby2.5 bundle install --path=.
+serverless deploy
+```
+
+## Part 9
+* Fill values automatically every 5 minutes. => Cron function
+
+## Part 10
+* Scan Table add to SQS, get values with delay and update dynamodb
