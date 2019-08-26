@@ -14,7 +14,6 @@ provider:
 
   iamRoleStatements:
     - Effect: Allow
-    - Effect: Allow
       Action:
         - dynamodb:PutItem
         - dynamodb:Query
@@ -22,10 +21,14 @@ provider:
         - dynamodb:UpdateItem
         - dynamodb:GetItem
       Resource:
-        - { 'Fn::Join': [':', ['arn:aws:dynamodb:eu-central-1:', { Ref: 'AWSAccountId' }, ':table/weatherTable']] }
-        - arn:aws:dynamodb:eu-west-1:818127503771:table/weatherTable
-        - arn:aws:dynamodb:eu-west-1:818127503771:table/pubg-matches-v4
-        - arn:aws:dynamodb:eu-west-1:818127503771:table/pubg-search
+        Fn::Join:
+          - ':'
+          - - arn
+            - aws
+            - dynamodb
+            - Ref: AWS::Region
+            - Ref: AWS::AccountId
+            - table/weatherTable
 
 layers:
   gemLayer:
