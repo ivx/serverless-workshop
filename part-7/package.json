@@ -4,7 +4,6 @@
   "version": "0.1.0",
   "dependencies": {},
   "devDependencies": {
-    "serverless-ruby-package": "^1.1.2",
     "serverless-s3-sync": "^1.8.0"
   }
 }

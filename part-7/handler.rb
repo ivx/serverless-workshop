@@ -1,3 +1,4 @@
+#!/bin/ruby
 require 'json'
 require 'httparty'
 

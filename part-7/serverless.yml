@@ -2,7 +2,6 @@ service: serverless-workshop-part-1
 
 plugins:
   - serverless-s3-sync
-
 provider:
   name: aws
   runtime: ruby2.5
@@ -13,9 +12,17 @@ provider:
   tracing:
     lambda: true
 
+layers:
+  gemLayer:
+    path: ruby
+
 functions:
   temperature:
     handler: handler.temperature
+    layers:
+      - {Ref: GemLayerLambdaLayer}
+    environment:
+      GEM_PATH: /opt/2.5.0
     events:
       - http:
           path: temperature
