@@ -27,3 +27,19 @@ def temperature(event:, context:)
     }
   }
 end
+
+def updateTemperature(event:, context:)
+  url = 'https://www.metaweather.com/api/location/646099/'
+  resp = HTTParty.get(url).parsed_response
+  temp = resp['consolidated_weather'].first['the_temp'].round(1)
+
+  resp = DYNAMO_DB.update_item({
+    table_name: 'weather',
+    key: {
+      locationId: 1
+    },
+    update_expression: 'set temperature = :t',
+    expression_attribute_values: {':t' => temp }
+  })
+  puts resp.inspect
+end

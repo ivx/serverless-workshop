@@ -21,14 +21,9 @@ provider:
         - dynamodb:UpdateItem
         - dynamodb:GetItem
       Resource:
-        Fn::Join:
-          - ':'
-          - - arn
-            - aws
-            - dynamodb
-            - Ref: AWS::Region
-            - Ref: AWS::AccountId
-            - table/weather
+        Fn::GetAtt:
+          - WeatherTable
+          - Arn
 
 layers:
   gemLayer:
@@ -45,6 +40,30 @@ functions:
       - http:
           path: temperature
           method: get
+
+  updateTemperature:
+    handler: handler.updateTemperature
+    layers:
+      - {Ref: GemLayerLambdaLayer}
+    environment:
+      GEM_PATH: /opt/2.5.0
+    reservedConcurrency: 1
+    events:
+      - sqs:
+          arn:
+            Fn::GetAtt:
+              - WeatherQueue
+              - Arn
+          batchSize: 2
+
+  generateList:
+    handler: handler.generateList
+    layers:
+      - {Ref: GemLayerLambdaLayer}
+    environment:
+      GEM_PATH: /opt/2.5.0
+    events:
+      - schedule: rate(5 minutes)
 
 custom:
   siteName: serverless-workshop-s3-bucket
@@ -68,6 +87,7 @@ resources:
         ProvisionedThroughput:
           ReadCapacityUnits: 1
           WriteCapacityUnits: 1
+
     StaticSite:
       Type: AWS::S3::Bucket
       Properties:
@@ -75,6 +95,26 @@ resources:
         BucketName: ${self:custom.siteName}
         WebsiteConfiguration:
           IndexDocument: index.html
+
+    WeatherQueue:
+      Type: "AWS::SQS::Queue"
+      Properties:
+        QueueName: "Weather"
+        VisibilityTimeout: 30
+        MessageRetentionPeriod: 60
+        RedrivePolicy:
+          deadLetterTargetArn:
+            "Fn::GetAtt":
+              - WeatherDeadLetterQueue
+              - Arn
+          maxReceiveCount: 1
+
+    WeatherDeadLetterQueue:
+      Type: "AWS::SQS::Queue"
+      Properties:
+        QueueName: "WeatherDLQ"
+        MessageRetentionPeriod: 1209600 # 14 days in seconds
+
     StaticSiteS3BucketPolicy:
       Type: AWS::S3::BucketPolicy
       Properties:

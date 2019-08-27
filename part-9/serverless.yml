@@ -46,6 +46,15 @@ functions:
           path: temperature
           method: get
 
+  updateTemperature:
+    handler: handler.updateTemperature
+    layers:
+      - {Ref: GemLayerLambdaLayer}
+    environment:
+      GEM_PATH: /opt/2.5.0
+    events:
+      - schedule: rate(1 minute)
+
 custom:
   siteName: serverless-workshop-s3-bucket
 
@@ -68,6 +77,7 @@ resources:
         ProvisionedThroughput:
           ReadCapacityUnits: 1
           WriteCapacityUnits: 1
+
     StaticSite:
       Type: AWS::S3::Bucket
       Properties:
@@ -75,6 +85,7 @@ resources:
         BucketName: ${self:custom.siteName}
         WebsiteConfiguration:
           IndexDocument: index.html
+
     StaticSiteS3BucketPolicy:
       Type: AWS::S3::BucketPolicy
       Properties:

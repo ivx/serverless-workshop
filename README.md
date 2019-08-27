@@ -158,12 +158,12 @@ docker run --rm -it -v $PWD:/var/gem_build -w /var/gem_build lambci/lambda:build
 
 ## Part 8
 * That are some bad response times. Lets fix this through DynamoDB.
-* Add table
+* Add table in serverless.yml
 ```
-    weatherTable:
+    WeatherTable:
       Type: AWS::DynamoDB::Table
       Properties:
-        TableName: weatherTable
+        TableName: weather
         AttributeDefinitions:
           - AttributeName: locationId
             AttributeType: N
@@ -174,11 +174,39 @@ docker run --rm -it -v $PWD:/var/gem_build -w /var/gem_build lambci/lambda:build
           ReadCapacityUnits: 1
           WriteCapacityUnits: 1
 ```
+* Allow tables to be accessed by code
+```
+  tracing:
+    lambda: true
+
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - dynamodb:PutItem
+        - dynamodb:Query
+        - dynamodb:Scan
+        - dynamodb:UpdateItem
+        - dynamodb:GetItem
+      Resource:
+        Fn::Join:
+          - ':'
+          - - arn
+            - aws
+            - dynamodb
+            - Ref: AWS::Region
+            - Ref: AWS::AccountId
+            - table/weather
+```
+
 * Fill table with one value manually through AWS Cli
-* Refactor method to use dynamodb tables instead of api. See part-8 handler.rb
 * Add dynamodb gem into Gemfile
 ```
 gem 'aws-sdk-dynamodb'
+```
+* Require it in code
+```
+require 'aws-sdk-dynamodb'
+DYNAMO_DB = Aws::DynamoDB::Client.new(region: 'eu-central-1')
 ```
 * Install locally gems
 ```
@@ -189,9 +217,28 @@ bundle --no-deployment
 docker run --rm -it -v $PWD:/var/gem_build -w /var/gem_build lambci/lambda:build-ruby2.5 bundle install --path=.
 serverless deploy
 ```
+* Refactor method to use dynamodb table instead of api retriebe value. See part-8 handler.rb
 
 ## Part 9
-* Fill values automatically every 5 minutes. => Cron function
+* In the next part we will update the value in the database automatically
+* We will add a new function with the following event type:
+```
+    events:
+      - schedule: rate(1 minute)
+```
+* Then we will add some code to update the value in the dynamodb table.
 
 ## Part 10
-* Scan Table add to SQS, get values with delay and update dynamodb
+* In our last step we will add SQS to our serverless application. In our mind we want to ensure
+that if we query more locations, we use our weather api effectively. In most cases APIs allow to get several values at
+onces. For our API this is not the case but we will still use this pattern in the example. We will always
+get two locations at once and we will ensure that we are not running two api requests at once.
+* First we add a new gem `aws-sdk-sqs` to our project and require it in the code.
+* We need a SQS Queue to be able to send messages into SQS. We will create it in serverless.yml
+```
+```
+* We will add a new function, called generateList which will set to scheduled at every minute.
+* Then we create a function which generates a list, and inserts messages into SQS.
+* Our old updateTemperature method will be rewritten to be triggered by SQS.
+* Through reservedConcurrency we ensure that no more than x api requests are send concurrently.
+* Through delay in sqs we show a different possibility to care for api limits. 
