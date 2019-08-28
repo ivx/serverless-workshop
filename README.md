@@ -242,3 +242,4 @@ get two locations at once and we will ensure that we are not running two api req
 * Our old updateTemperature method will be rewritten to be triggered by SQS.
 * Through reservedConcurrency we ensure that no more than x api requests are send concurrently.
 * Through delay in sqs we show a different possibility to care for api limits. 
+* And we introduce local payloads for local testing.
