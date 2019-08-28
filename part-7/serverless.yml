@@ -1,4 +1,4 @@
-service: serverless-workshop-part-1
+service: serverless-workshop
 
 plugins:
   - serverless-s3-sync
