@@ -24,6 +24,14 @@ provider:
         Fn::GetAtt:
           - WeatherTable
           - Arn
+    - Effect: Allow
+      Action:
+        - sqs:ReceiveMessage
+        - sqs:SendMessage
+      Resource:
+        - Fn::GetAtt:
+            - WeatherQueue
+            - Arn
 
 layers:
   gemLayer:
@@ -62,6 +70,7 @@ functions:
       - {Ref: GemLayerLambdaLayer}
     environment:
       GEM_PATH: /opt/2.5.0
+      SQS_URL: !Ref WeatherQueue
     events:
       - schedule: rate(5 minutes)
 

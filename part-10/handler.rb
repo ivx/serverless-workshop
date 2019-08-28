@@ -47,15 +47,18 @@ def updateTemperature(event:, context:)
     })
     puts resp.inspect
   end
+  return 'Finished'
 end
 
-def generateList(even:, context:)
+def generateList(event:, context:)
   locationList = [646099,667931,638242,656958,2487956,766273]
   delay = 0
 
-  locations.each do |l|
+  locationList.each do |l|
     sqs_message = { locationId: l}
     SQS.send_message(queue_url: ENV['SQS_URL'], message_body: sqs_message.to_json, delay_seconds: delay)
     delay += 10
   end
+
+  return 'Finished'
 end
