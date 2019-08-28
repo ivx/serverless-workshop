@@ -9,7 +9,7 @@ SQS = Aws::SQS::Client.new(region: 'eu-central-1')
 
 def temperature(event:, context:)
   db_query = {
-    table_name: 'weatherTable',
+    table_name: 'weather',
     expression_attribute_values: {
       ':id' => 1
     },
@@ -31,20 +31,22 @@ def temperature(event:, context:)
 end
 
 def updateTemperature(event:, context:)
-  puts event.inspect
-  #url = 'https://www.metaweather.com/api/location/646099/'
-  #resp = HTTParty.get(url).parsed_response
-  #temp = resp['consolidated_weather'].first['the_temp'].round(1)
-
-  #resp = DYNAMO_DB.update_item({
-  #  table_name: 'weatherTable',
-  #  key: {
-  #    locationId: 1
-  #  },
-  #  update_expression: 'set temperature = :t',
-  #  expression_attribute_values: {':t' => temp }
-  #})
-  #puts resp.inspect
+  event['Records'].each do |r|
+    event = JSON.parse(r['body'])
+    locationId = event['locationId']
+    url = "https://www.metaweather.com/api/location/#{locationId}/"
+    resp = HTTParty.get(url).parsed_response
+    temp = resp['consolidated_weather'].first['the_temp'].round(1)
+    resp = DYNAMO_DB.update_item({
+      table_name: 'weather',
+      key: {
+        locationId: locationId
+      },
+      update_expression: 'set temperature = :t',
+      expression_attribute_values: {':t' => temp }
+    })
+    puts resp.inspect
+  end
 end
 
 def generateList(even:, context:)
@@ -52,6 +54,7 @@ def generateList(even:, context:)
   delay = 0
 
   locations.each do |l|
+    sqs_message = { locationId: l}
     SQS.send_message(queue_url: ENV['SQS_URL'], message_body: sqs_message.to_json, delay_seconds: delay)
     delay += 10
   end
