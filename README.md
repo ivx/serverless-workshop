@@ -23,7 +23,10 @@ serverless config credentials --provider aws --key AKIAIOSFODNN7EXAMPLE --secret
 ## Part 1 - Get your first app running
 * Each folder in this git repository shows a working end state
 * Create a new directory and initialize a serverless app
- serverless create --template aws-ruby
+```
+serverless create --template aws-ruby
+```
+
 * Deploy our new app
 ```
 serverless deploy -v 
