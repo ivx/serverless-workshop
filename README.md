@@ -27,6 +27,8 @@ serverless config credentials --provider aws --key AKIAIOSFODNN7EXAMPLE --secret
 serverless create --template aws-ruby
 ```
 
+* Delete all comments in serverless.yml to see all your config at one glance.
+
 * Deploy our new app
 ```
 serverless deploy -v 
@@ -38,6 +40,13 @@ serverless invoke -f hello
 ```
 
 * Let it greet yourself. Change code in handler.rb to greet yourself.
+```
+def hello(event:, context:)
+  { statusCode: 200, body: JSON.generate('Hello CHANGE_TO_YOUR_USERNAME :)') }
+end
+```
+
+* Redeploy only the lambda function code.
 ```
 serverless deploy -f hello
 ```
@@ -73,7 +82,8 @@ params = event['queryStringParameters']
 { statusCode: 200, body: JSON.generate("Hello @InVision #{params['name']}") }
 ```
 
-* You can add error handling if you want. For example event['queryStringParameters'] can be `nil` if not params are send.
+* You can add error handling if you want.
+For example event['queryStringParameters'] can be `nil` if no params are attached to your request.
 
 ## Part 4 - Add a frontend on s3
 
@@ -92,13 +102,31 @@ plugins:
 provider:
 ```
 * Configure plugin - See directory part-4 serverless.yml
+* Change bucket name in serverless.yml, otherwise you will get an error during deployment.
+S3 Bucket names must be unique over all regions and accounts.
+```
+  siteName: serverless-workshop-thomas
+```
+
+* Create a `static` directory and add a index.html in the directory. This will be our website.
+```
+<html>
+  <head>
+  </head>
+  <body>
+    <h1>Hello DUS</h1>
+  </body>
+</html>
+```
+
 * Deploy everything
 ```
 serverless deploy -v
 ```
-* Visit url: `http://serverless-workshop-s3-bucket.s3-website.eu-central-1.amazonaws.com/`
+
+* Visit url: `http://YOUR_BUCKET_NAME.s3-website.eu-central-1.amazonaws.com/`
 * Change some text in index.html
-* Redeploy on s3 files
+* Redeploy only s3 files
 ```
 sls s3sync
 ```
@@ -107,7 +135,7 @@ sls s3sync
 
 * Show weather data in user interface for Duesseldorf
 * Delete hello function everywhere (serverless.yml and handler.rb)
-* Create temperature function which outputs static value
+* Create temperature function which outputs static value. See handler.rb in part-5 directory for help.
 * Allow cross-origin request through adding header in function output
 ```
   {
@@ -132,6 +160,7 @@ provider:
   tracing:
     lambda: true
 ```
+
 * Visit AWS [X-RAY](https://eu-central-1.console.aws.amazon.com/xray/home) dashboard
 * Create new cloudwatch dashboard together - https://eu-central-1.console.aws.amazon.com/cloudwatch/home?region=eu-central-1#dashboards:
 
@@ -156,6 +185,7 @@ functions:
     environment:
       GEM_PATH: /opt/2.5.0
 ```
+
 * Install gems locally, compiled through docker on linux
 ```
 docker run --rm -it -v $PWD:/var/gem_build -w /var/gem_build lambci/lambda:build-ruby2.5 bundle install --path=.
@@ -179,6 +209,7 @@ docker run --rm -it -v $PWD:/var/gem_build -w /var/gem_build lambci/lambda:build
           ReadCapacityUnits: 1
           WriteCapacityUnits: 1
 ```
+
 * Allow tables to be accessed by code
 ```
   tracing:
@@ -208,20 +239,24 @@ docker run --rm -it -v $PWD:/var/gem_build -w /var/gem_build lambci/lambda:build
 ```
 gem 'aws-sdk-dynamodb'
 ```
+
 * Require it in code
 ```
 require 'aws-sdk-dynamodb'
 DYNAMO_DB = Aws::DynamoDB::Client.new(region: 'eu-central-1')
 ```
+
 * Install locally gems
 ```
 bundle --no-deployment 
 ```
+
 * Update gem layer
 ```
 docker run --rm -it -v $PWD:/var/gem_build -w /var/gem_build lambci/lambda:build-ruby2.5 bundle install --path=.
 serverless deploy
 ```
+
 * Refactor method to use dynamodb table instead of api retriebe value. See part-8 handler.rb
 
 ## Part 9 - Update dynamodb template automatically
