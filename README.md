@@ -15,6 +15,11 @@ https://nodejs.org/dist/v10.16.3/node-v10.16.3-x86.msi
 npm install -g serverless
 ```
 
+* Update if you already have it install please!
+```
+npm update -g serverless  
+```
+
 * Configure aws credentials in serverless framework
 ```
 serverless config credentials --provider aws --key AKIAIOSFODNN7EXAMPLE --secret wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
@@ -78,6 +83,10 @@ serverless deploy -f hello
 
 * We just spawned our first api gateway together.
 * Verify api gateway in aws interace.
+* Get url of your functions through:
+```
+serverless info
+```
 * Let's talk about api gateway.
 
 ## Part 3 - Let our function greet others via GET Parameter
@@ -90,6 +99,11 @@ params = event['queryStringParameters']
 
 * You can add error handling if you want.
 For example event['queryStringParameters'] can be `nil` if no params are attached to your request.
+
+* Try out get parameter
+```
+curl https://your-api-id.execute-api.eu-central-1.amazonaws.com/dev/hello?name=greta
+```
 
 ## Part 4 - Add a frontend on s3
 
@@ -111,7 +125,7 @@ provider:
 * Change bucket name in serverless.yml, otherwise you will get an error during deployment.
 S3 Bucket names must be unique over all regions and accounts.
 ```
-  siteName: serverless-workshop-thomas
+  siteName: serverless-workshop-trivago-ADD_SOME_IDENTIFIER
 ```
 
 * Create a `static` directory and add a index.html in the directory. This will be our website.
@@ -289,4 +303,6 @@ get two locations at once and we will ensure that we are not running two api req
 * Let's talk about SQS pricing, how lambda binds to SQS and the costs when you do not have a Dead Letter Queue.
 
 # You are bored?
-* Read about costs: https://medium.com/@amiram_26122/the-hidden-costs-of-serverless-6ced7844780b
+## Read about costs
+* Read about serverless costs https://medium.com/@amiram_26122/the-hidden-costs-of-serverless-6ced7844780b
+* Try tuning your lambda costs via tool https://github.com/alexcasalboni/aws-lambda-power-tuning
