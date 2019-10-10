@@ -52,6 +52,11 @@ serverless deploy -f hello
 ```
 
 * Verify cloudformation template in aws interface.
+* Show logs
+```
+serverless logs -f hello
+```
+* Let's talk about cost savings by increasing memory? - WAIT? / WHAT?
 
 ## Part 2 - Add a http endpoint via api gateway
 
@@ -73,6 +78,7 @@ serverless deploy -f hello
 
 * We just spawned our first api gateway together.
 * Verify api gateway in aws interace.
+* Let's talk about api gateway.
 
 ## Part 3 - Let our function greet others via GET Parameter
 
@@ -130,6 +136,7 @@ serverless deploy -v
 ```
 sls s3sync
 ```
+* Let's talk about cloudfront / s3 combination. Different possibilities e.g. netlify.
 
 ## Part 5 - Allow connection from frontend to backend via HEADER manipulation
 
@@ -163,6 +170,7 @@ provider:
 
 * Visit AWS [X-RAY](https://eu-central-1.console.aws.amazon.com/xray/home) dashboard
 * Create new cloudwatch dashboard together - https://eu-central-1.console.aws.amazon.com/cloudwatch/home?region=eu-central-1#dashboards:
+* Let's talk about costs of monitoring and how important it is.
 
 ## Part 7 - Use a http lib in lambda layer
 * Now we will add real data to the request and see latency rise.
@@ -252,7 +260,8 @@ docker run --rm -it -v $PWD:/var/gem_build -w /var/gem_build lambci/lambda:build
 serverless deploy
 ```
 
-* Refactor method to use dynamodb table instead of api retriebe value. See part-8 handler.rb
+* Refactor method to use dynamodb table instead of directly using api to retrieve temperature. See part-8 handler.rb.
+* Let's talk about cost / scaling of dynamodb.
 
 ## Part 9 - Update dynamodb template automatically
 * In the next part we will update the value in the database automatically
@@ -262,6 +271,7 @@ serverless deploy
       - schedule: rate(1 minute)
 ```
 * Then we will add some code to update the value in the dynamodb table.
+* Let's talk about use cases of schedules. Static vs dynamic content.
 
 ## BONUS - Finish our app with some SQS messaging
 * In our last step we will add SQS to our serverless application. In our mind we want to ensure
@@ -276,3 +286,7 @@ get two locations at once and we will ensure that we are not running two api req
 * Through reservedConcurrency we ensure that no more than x api requests are send concurrently.
 * Through delay in sqs we show a different possibility to care for api limits. 
 * And we introduce local payloads for local testing.
+* Let's talk about SQS pricing, how lambda binds to SQS and the costs when you do not have a Dead Letter Queue.
+
+# You are bored?
+* Read about costs: https://medium.com/@amiram_26122/the-hidden-costs-of-serverless-6ced7844780b
