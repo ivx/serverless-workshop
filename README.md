@@ -224,14 +224,9 @@ docker run --rm -it -v $PWD:/var/gem_build -w /var/gem_build lambci/lambda:build
         - dynamodb:UpdateItem
         - dynamodb:GetItem
       Resource:
-        Fn::Join:
-          - ':'
-          - - arn
-            - aws
-            - dynamodb
-            - Ref: AWS::Region
-            - Ref: AWS::AccountId
-            - table/weather
+        Fn::GetAtt:
+          - WeatherTable
+          - Arn
 ```
 
 * Fill table with one value manually through AWS Cli
