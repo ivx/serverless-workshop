@@ -78,7 +78,7 @@ functions:
 
 * Redeploy whole stack
 ```
-serverless deploy -f hello
+serverless deploy
 ```
 
 * We just spawned our first api gateway together.
