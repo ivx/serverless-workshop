@@ -213,6 +213,13 @@ functions:
 docker run --rm -it -v $PWD:/var/gem_build -w /var/gem_build lambci/lambda:build-ruby2.5 bundle install --path=.
 ```
 
+* If you get problems during this step. For example do not have docker installed. Just rename directory ruby-layer to ruby. This is a ready directory to use.
+
+* Deploy everything
+```
+serverless deploy
+```
+
 ## Part 8 - Lets fix response times through dynamodb
 * That are some bad response times. Lets fix this through DynamoDB.
 * Add table in serverless.yml
