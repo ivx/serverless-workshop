@@ -192,7 +192,25 @@ sls s3sync
 
 * Show weather data in user interface for Duesseldorf
 * Delete hello function everywhere (serverless.yml and handler.rb)
-* Create temperature function which outputs static value. See handler.rb in part-5 directory for help.
+* Create temperature function which outputs static value
+```
+def temperature(event:, context:)
+  {
+    statusCode: 200,
+    body: JSON.generate({temperature: 10})
+  }
+end
+```
+* Create event handler which listens on /temperature on api gateway
+```
+functions:
+  temperature:
+    handler: handler.temperature
+    events:
+    - http:
+        path: temperature
+        method: get
+```
 * Allow cross-origin request through adding header in function output
 ```
   {
