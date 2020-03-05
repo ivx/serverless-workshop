@@ -25,6 +25,9 @@ custom:
       localDir: static
 
 resources:
+  Outputs:
+    Website:
+      Value: http://${self:custom.siteName}.s3-website.${self:provider.region}.amazonaws.com/
   Resources:
     StaticSite:
       Type: AWS::S3::Bucket

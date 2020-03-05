@@ -116,11 +116,12 @@ serverless deploy
 
 * We just spawned our first api gateway together
 * Verify api gateway in aws interace
+![API Gateway](/img/api-gateway.png)
 * Get url of your functions
 ```
 serverless info
 ```
-* Let's talk about api gateway
+* Discuss possibilites of api gateway
 
 ## Part 3 - Let our function greet others via GET Parameter
 
@@ -144,6 +145,8 @@ curl https://your-api-id.execute-api.eu-central-1.amazonaws.com/dev/hello?name=g
 * To deploy static sites with serverless framework, we need a plugin
 ```
 serverless plugin install -n serverless-s3-sync
+# or
+cd part4;npm install
 ```
 * Add plugin to serverless.yml
 ```
@@ -154,7 +157,9 @@ plugins:
 
 provider:
 ```
-* Configure plugin - See directory part-4 serverless.yml
+* Configure plugin - See directory part-4 serverless.yml for details.
+* We add a new root element to the serverless.yml - Resources.
+* Check out [aws resources possibilities](https://serverless.com/framework/docs/providers/aws/guide/resources/).
 
 * Create a `static` directory and add a index.html in the directory
 ```
@@ -162,7 +167,7 @@ provider:
   <head>
   </head>
   <body>
-    <h1>Hello DUS</h1>
+    <h1>Hello World</h1>
   </body>
 </html>
 ```
@@ -172,7 +177,10 @@ provider:
 serverless deploy -v
 ```
 
-* Visit url: `http://YOUR_BUCKET_NAME.s3-website.eu-central-1.amazonaws.com/`
+* Get [cloudformation outputs](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/outputs-section-structure.html) to get website url
+```
+sls info -v
+```
 * Change some text in index.html
 * Redeploy only s3 files
 ```

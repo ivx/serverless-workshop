@@ -18,13 +18,16 @@ functions:
         method: get
 
 custom:
-  siteName: :SERVERLESS-WORKSHOP-S3-BUCKET-PLACEHOLDER:
+  siteName: serverless-workshop-thomas
 
   s3Sync:
     - bucketName: ${self:custom.siteName}
       localDir: static
 
 resources:
+  Outputs:
+    Website:
+      Value: http://${self:custom.siteName}.s3-website.${self:provider.region}.amazonaws.com/
   Resources:
     StaticSite:
       Type: AWS::S3::Bucket

@@ -37,9 +37,9 @@ functions:
     environment:
       GEM_PATH: /opt/2.5.0
     events:
-      - http:
-          path: temperature
-          method: get
+    - http:
+        path: temperature
+        method: get
 
   updateTemperature:
     handler: handler.updateTemperature
@@ -58,6 +58,9 @@ custom:
       localDir: static
 
 resources:
+  Outputs:
+    Website:
+      Value: http://${self:custom.siteName}.s3-website.${self:provider.region}.amazonaws.com/
   Resources:
     WeatherTable:
       Type: AWS::DynamoDB::Table
