@@ -20,10 +20,20 @@ npm install -g serverless
 npm update -g serverless  
 ```
 
-* Configure aws credentials in serverless framework
+* Create AWS account
+* Log into your account
+* Visit IAM Portal and click Users [IAM Users](https://console.aws.amazon.com/iam/home?region=eu-west-1#/users)
+* Add user `serverless-cli` and allow `programmatic acccess`
+![Add User](/img/add-user.png)
+* For simplicity attach existing policy `AdministratorAccess`
+![Add user permissions](/img/add-user-permissions.png)
+* Keep browser window with credentials open
+![Add user credentials](/img/add-user-credentials.png)
+* Configure aws credentials in serverless framework in your terminal
 ```
 serverless config credentials --provider aws --key AKIAIOSFODNN7EXAMPLE --secret wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
 ```
+* Close credentials browser window
 
 ## Part 1 - Get your first app running
 * Each folder in this git repository shows a working end state
