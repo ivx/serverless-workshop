@@ -50,11 +50,15 @@ serverless config credentials --provider aws --key AKIAIOSFODNN7EXAMPLE --secret
 
 ## Part 1 - Get your first function running
 * Create a new directory and initialize a serverless app
+* We will use ruby as language. In  most parts the language is totally unimportant,
+feel free to spice up your experience by using a different language.
 ```
+mkdir my-own-code;cd my-own-code
 serverless create --template aws-ruby
 ```
 
 * Delete all comments in serverless.yml to see all your config at one glance
+![Serverless simple config](/img/serverless-simple-config.png)
 
 * Deploy your new app
 ```
@@ -86,6 +90,11 @@ serverless deploy -f hello
 serverless logs -f hello
 ```
 * Let's talk about the potential of cost savings by increasing memory
+* Delete your stack and recreate afterwards
+```
+serverless remove
+serverless deploy
+```
 
 ## Part 2 - Add a http endpoint via api gateway
 
