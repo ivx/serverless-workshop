@@ -18,7 +18,7 @@ functions:
         method: get
 
 custom:
-  siteName: serverless-workshop-s3-bucket-1
+  siteName: serverless-workshop-ADD-SOME-IDENTIFIER-1
 
   s3Sync:
     - bucketName: ${self:custom.siteName}

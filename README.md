@@ -135,7 +135,11 @@ provider:
 * Change bucket name in serverless.yml, otherwise you will get an error during deployment
 S3 Bucket names must be unique over all regions and accounts
 ```
-  siteName: serverless-workshop-trivago-ADD_SOME_IDENTIFIER
+  siteName: serverless-workshop-trivago-ADD-SOME-IDENTIFIER
+```
+* You can run `sed` to change it in all directories
+```
+sed -i '' 's/siteName: serverless-workshop-s3-bucket/siteName: serverless-workshop-ADD-SOME-IDENTIFIER/' */serverless.yml
 ```
 
 * Create a `static` directory and add a index.html in the directory

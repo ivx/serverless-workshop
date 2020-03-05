@@ -51,7 +51,7 @@ functions:
       - schedule: rate(1 minute)
 
 custom:
-  siteName: serverless-workshop-s3-bucket
+  siteName: serverless-workshop-ADD-SOME-IDENTIFIER
 
   s3Sync:
     - bucketName: ${self:custom.siteName}
