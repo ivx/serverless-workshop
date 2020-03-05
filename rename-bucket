@@ -1,2 +1,2 @@
 #!/bin/bash
-sed -i '' "s/siteName: serverless-workshop-s3-bucket/siteName: serverless-workshop-${1}/" */serverless.yml
+sed -i '' "s/siteName: :SERVERLESS-WORKSHOP-S3-BUCKET-PLACEHOLDER:/siteName: ${1}/" */serverless.yml

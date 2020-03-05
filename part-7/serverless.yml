@@ -29,7 +29,7 @@ functions:
           method: get
 
 custom:
-  siteName: serverless-workshop-ADD-SOME-IDENTIFIER
+  siteName: :SERVERLESS-WORKSHOP-S3-BUCKET-PLACEHOLDER:
 
   s3Sync:
     - bucketName: ${self:custom.siteName}

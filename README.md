@@ -36,7 +36,7 @@ serverless config credentials --provider aws --key AKIAIOSFODNN7EXAMPLE --secret
 * Close credentials browser window
 * During the course we will work with a s3 bucket which must be unique through all aws regions / accounts.
 ```
-  siteName: serverless-workshop-trivago-ADD-SOME-IDENTIFIER
+  siteName: :SERVERLESS-WORKSHOP-S3-BUCKET-PLACEHOLDER:
 ```
 * There is a script which is able to exchange the bucket name easily
 ```
