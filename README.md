@@ -15,7 +15,7 @@ https://nodejs.org/dist/v10.16.3/node-v10.16.3-x86.msi
 npm install -g serverless
 ```
 
-* Update if you already have it install please!
+* Update the cli if you already have it installed
 ```
 npm update -g serverless  
 ```
@@ -42,7 +42,7 @@ serverless config credentials --provider aws --key AKIAIOSFODNN7EXAMPLE --secret
 serverless create --template aws-ruby
 ```
 
-* Delete all comments in serverless.yml to see all your config at one glance.
+* Delete all comments in serverless.yml to see all your config at one glance
 
 * Deploy our new app
 ```
@@ -54,24 +54,24 @@ serverless deploy -v
 serverless invoke -f hello
 ```
 
-* Let it greet yourself. Change code in handler.rb to greet yourself.
+* Let it greet yourself. Change code in handler.rb to greet yourself
 ```
 def hello(event:, context:)
   { statusCode: 200, body: JSON.generate('Hello CHANGE_TO_YOUR_USERNAME :)') }
 end
 ```
 
-* Redeploy only the lambda function code.
+* Redeploy only the lambda function code
 ```
 serverless deploy -f hello
 ```
 
-* Verify cloudformation template in aws interface.
+* Verify cloudformation template in aws interface
 * Show logs
 ```
 serverless logs -f hello
 ```
-* Let's talk about cost savings by increasing memory? - WAIT? / WHAT?
+* Let's talk about cost savings by increasing memory
 
 ## Part 2 - Add a http endpoint via api gateway
 
@@ -91,24 +91,24 @@ functions:
 serverless deploy
 ```
 
-* We just spawned our first api gateway together.
-* Verify api gateway in aws interace.
-* Get url of your functions through:
+* We just spawned our first api gateway together
+* Verify api gateway in aws interace
+* Get url of your functions
 ```
 serverless info
 ```
-* Let's talk about api gateway.
+* Let's talk about api gateway
 
 ## Part 3 - Let our function greet others via GET Parameter
 
-* We want to greet other persons as well. So lets add a GET Parameter to the function.
+* We want to greet other persons as well. So lets add a GET Parameter to the function
 ```
 params = event['queryStringParameters']
 { statusCode: 200, body: JSON.generate("Hello @InVision #{params['name']}") }
 ```
 
-* You can add error handling if you want.
-For example event['queryStringParameters'] can be `nil` if no params are attached to your request.
+* You can add error handling if you want
+For example event['queryStringParameters'] can be `nil` if no params are attached to your request
 
 * Try out get parameter
 ```
@@ -118,7 +118,7 @@ curl https://your-api-id.execute-api.eu-central-1.amazonaws.com/dev/hello?name=g
 ## Part 4 - Add a frontend on s3
 
 * We need a frontend for our serverless app
-* To deploy static sites with serverless framework, we need a plugin.
+* To deploy static sites with serverless framework, we need a plugin
 ```
 serverless plugin install -n serverless-s3-sync
 ```
@@ -132,13 +132,13 @@ plugins:
 provider:
 ```
 * Configure plugin - See directory part-4 serverless.yml
-* Change bucket name in serverless.yml, otherwise you will get an error during deployment.
-S3 Bucket names must be unique over all regions and accounts.
+* Change bucket name in serverless.yml, otherwise you will get an error during deployment
+S3 Bucket names must be unique over all regions and accounts
 ```
   siteName: serverless-workshop-trivago-ADD_SOME_IDENTIFIER
 ```
 
-* Create a `static` directory and add a index.html in the directory. This will be our website.
+* Create a `static` directory and add a index.html in the directory
 ```
 <html>
   <head>
@@ -194,10 +194,10 @@ provider:
 
 * Visit AWS [X-RAY](https://eu-central-1.console.aws.amazon.com/xray/home) dashboard
 * Create new cloudwatch dashboard together - https://eu-central-1.console.aws.amazon.com/cloudwatch/home?region=eu-central-1#dashboards:
-* Let's talk about costs of monitoring and how important it is.
+* Let's talk about costs of monitoring and how important it is
 
 ## Part 7 - Use a http lib in lambda layer
-* Now we will add real data to the request and see latency rise.
+* Now we will add real data to the request and see latency rise
 * Add real weather api call. Sponsored through metaweather api.
 * Get your location id first e.g. "646099" for Düsseldorf [Metaweather API Location search](https://www.metaweather.com/api/location/search/?query=d%C3%BCsseldorf)
 * Api call to get data `https://www.metaweather.com/api/location/646099/`
@@ -301,8 +301,8 @@ serverless deploy
     events:
       - schedule: rate(1 minute)
 ```
-* Then we will add some code to update the value in the dynamodb table.
-* Let's talk about use cases of schedules. Static vs dynamic content.
+* Then we will add some code to update the value in the dynamodb table
+* Let's talk about use cases of schedules. Static vs dynamic content
 
 ## BONUS - Finish our app with some SQS messaging
 * In our last step we will add SQS to our serverless application. In our mind we want to ensure
