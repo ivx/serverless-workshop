@@ -56,7 +56,7 @@ serverless create --template aws-ruby
 
 * Delete all comments in serverless.yml to see all your config at one glance
 
-* Deploy our new app
+* Deploy your new app
 ```
 serverless deploy -v 
 ```
@@ -73,17 +73,19 @@ def hello(event:, context:)
 end
 ```
 
-* Redeploy only the lambda function code
+* Redeploy only the lambda function
 ```
 serverless deploy -f hello
 ```
 
-* Verify cloudformation template in aws interface
+* Verify speed difference between deploying code / deploying whole cloudformation template
+* Find and verify cloudformation template in aws interface and check which resources were created
+![Cloudformation Resources](/img/cloudformation-resources.png)
 * Show logs
 ```
 serverless logs -f hello
 ```
-* Let's talk about cost savings by increasing memory
+* Let's talk about the potential of cost savings by increasing memory
 
 ## Part 2 - Add a http endpoint via api gateway
 
