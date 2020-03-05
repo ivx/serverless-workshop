@@ -34,9 +34,21 @@ npm update -g serverless
 serverless config credentials --provider aws --key AKIAIOSFODNN7EXAMPLE --secret wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
 ```
 * Close credentials browser window
+* During the course we will work with a s3 bucket which must be unique through all aws regions / accounts.
+```
+  siteName: serverless-workshop-trivago-ADD-SOME-IDENTIFIER
+```
+* There is a script which is able to exchange the bucket name easily
+```
+./rename-bucket serverless-workshop-devops-gathering-thomas-peitz
+```
 
-## Part 1 - Get your first app running
-* Each folder in this git repository shows a working end state
+## Pre Info
+* Each folder in this git repository shows a working end state.
+* You can do all stuff alone at home if it is to fast for you.
+* The learnings after each stage are more important than the actual coding of yourself.
+
+## Part 1 - Get your first function running
 * Create a new directory and initialize a serverless app
 ```
 serverless create --template aws-ruby
@@ -132,15 +144,6 @@ plugins:
 provider:
 ```
 * Configure plugin - See directory part-4 serverless.yml
-* Change bucket name in serverless.yml, otherwise you will get an error during deployment
-S3 Bucket names must be unique over all regions and accounts
-```
-  siteName: serverless-workshop-trivago-ADD-SOME-IDENTIFIER
-```
-* You can run `sed` to change it in all directories
-```
-sed -i '' 's/siteName: serverless-workshop-s3-bucket/siteName: serverless-workshop-ADD-SOME-IDENTIFIER/' */serverless.yml
-```
 
 * Create a `static` directory and add a index.html in the directory
 ```
