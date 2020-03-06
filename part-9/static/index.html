@@ -6,8 +6,6 @@
     <h1>Weather in DUS</h1>
     Temperature: <span id="weather"></span>
     <script>
-      let temperature = 0;
-
       axios.get('https://3i50ueo3he.execute-api.eu-central-1.amazonaws.com/dev/temperature')
         .then(function (response) {
           console.log(response.data);
