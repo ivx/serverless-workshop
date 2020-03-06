@@ -24,7 +24,7 @@ npm update -g serverless
 * Log into your account
 * Visit IAM Portal and click Users [IAM Users](https://console.aws.amazon.com/iam/home?region=eu-west-1#/users)
 * Add user `serverless-cli` and allow `programmatic acccess`
-![Add User](/img/add-user.png)
+![Add user](/img/add-user.png)
 * For simplicity attach existing policy `AdministratorAccess`
 ![Add user permissions](/img/add-user-permissions.png)
 * Keep browser window with credentials open
@@ -336,7 +336,6 @@ serverless deploy
           - Arn
 ```
 
-* Fill table with one value manually through AWS Cli
 * Add dynamodb gem into Gemfile
 ```
 gem 'aws-sdk-dynamodb'
@@ -359,7 +358,48 @@ docker run --rm -it -v $PWD:/var/gem_build -w /var/gem_build lambci/lambda:build
 serverless deploy
 ```
 
-* Refactor method to use dynamodb table instead of directly using api to retrieve temperature. See part-8 handler.rb.
+* Refactor code to use db. Here an example:
+```
+#!/bin/ruby
+require 'json'
+require 'httparty'
+require 'aws-sdk-dynamodb'
+
+DYNAMO_DB = Aws::DynamoDB::Client.new(region: 'eu-central-1')
+
+def temperature(event:, context:)
+  db_query = {
+    table_name: 'weather',
+    expression_attribute_values: {
+      ':id' => 1
+    },
+    key_condition_expression: 'locationId = :id',
+    projection_expression: 'temperature',
+  }
+
+  resp = DYNAMO_DB.query(db_query)
+
+  temp = resp['items'].first['temperature'].to_f.round(1)
+
+  {
+    statusCode: 200,
+    body: JSON.generate({temperature: temp}),
+    headers: {
+      'Access-Control-Allow-Origin': '*',
+    }
+  }
+end
+```
+
+* Fill table with one value manually through [AWS interface](https://eu-central-1.console.aws.amazon.com/dynamodb/home?region=eu-central-1)
+* Click `Create item`
+![Add item](/img/dynamodb-add-item.png)
+* Insert item with type `Number` named temperature and a value
+![Add number](/img/dynamodb-add-number.png)
+![Show row](/img/dynamodb-row.png)
+
+* Verify your code works :)
+
 * Let's talk about cost / scaling of dynamodb.
 
 ## Part 9 - Update dynamodb template automatically
