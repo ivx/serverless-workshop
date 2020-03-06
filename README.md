@@ -221,7 +221,19 @@ functions:
     }
   }
 ```
-* Update static/indxex.html with your api gateway address
+* You can retrieve your api gateway address via `sls info`
+```
+endpoints:
+  GET - https://ns62gxv4s6.execute-api.eu-central-1.amazonaws.com/dev/temperature
+```
+* Update static/indxex.html with your api gateway address via update-api-gateway script in all workshop folders
+```
+./update-api-gateway 3i50ueo3he.execute-api.eu-central-1.amazonaws.com
+```
+* This will exchange the axios network call
+```
+axios.get('https://MY-OWN-API-GATEWAY-ADDRESS/dev/temperature')
+```
 * Deploy all via `serverless deploy`
 
 ## Part 6 - Add monitoring to our functions through Cloudwatch / XRay

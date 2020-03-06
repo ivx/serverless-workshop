@@ -1,0 +1,2 @@
+#!/bin/bash
+sed -i '' "s/MY-OWN-API-GATEWAY-ADDRESS/${1}/" */static/index.html
