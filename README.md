@@ -404,27 +404,189 @@ end
 
 ## Part 9 - Update dynamodb template automatically
 * In the next part we will update the value in the database automatically
-* We will add a new function with the following event type:
+* We will use a new event type for that: `schedule` which allows to trigger a function periodically.
 ```
     events:
       - schedule: rate(1 minute)
 ```
+* This is the whole function definition
+```
+  updateTemperature:
+    handler: handler.updateTemperature
+    layers:
+      - {Ref: GemLayerLambdaLayer}
+    environment:
+      GEM_PATH: /opt/2.7.0
+    events:
+      - schedule: rate(1 minute)
+```
 * Then we will add some code to update the value in the dynamodb table
-* Let's talk about use cases of schedules. Static vs dynamic content
+```
+def updateTemperature(event:, context:)
+  url = 'https://www.metaweather.com/api/location/646099/'
+  resp = HTTParty.get(url).parsed_response
+  temp = resp['consolidated_weather'].first['the_temp'].round(1)
+
+  resp = DYNAMO_DB.update_item({
+    table_name: 'weather',
+    key: {
+      locationId: 1
+    },
+    update_expression: 'set temperature = :t',
+    expression_attribute_values: {':t' => temp }
+  })
+  puts resp.inspect
+end
+```
+* After deploying the code via `serverless deploy` we will verify the code is executed periodically through XRay.
 
 ## BONUS - Finish our app with some SQS messaging
-* In our last step we will add SQS to our serverless application. In our mind we want to ensure
-that if we query more locations, we use our weather api effectively. In most cases APIs allow to get several values at
-onces. For our API this is not the case but we will still use this pattern in the example. We will always
-get two locations at once and we will ensure that we are not running two api requests at once.
-* First we add a new gem `aws-sdk-sqs` to our project and require it in the code.
-* We need a SQS Queue to be able to send messages into SQS. We will create it in serverless.yml
+* In our last step we will add SQS (Simple Queue Service) to our serverless application.
+* In our mind we want to ensure that if we query more locations, we use our weather api effectively.
+* In most cases APIs allow to get several values at once.
+* For our API this is not the case  but we will still use this pattern in the example.
+* We will always get two locations at once and we will ensure that we are not running two api requests at once.
+* First we add a new gem `aws-sdk-sqs` to our Gemfile.
+```
+source 'https://rubygems.org'
+
+gem 'httparty'
+gem 'aws-sdk-dynamodb'
+gem 'aws-sdk-sqs'
+```
+
+* Install locally gems
+```
+bundle --no-deployment 
+```
+
+* Update gem layer
+```
+docker run --rm -it -v $PWD:/var/gem_build -w /var/gem_build lambci/lambda:build-ruby2.5 bundle install --path=.
+serverless deploy
+```
+* We will require the sqs sdk in the code and create a client
+```
+require 'aws-sdk-sqs'
+SQS = Aws::SQS::Client.new(region: 'eu-central-1')
+```
+* Create a SQS Queue in serverless.yml through resources definition
+```
+resources:
+  Resources:
+    WeatherQueue:
+      Type: "AWS::SQS::Queue"
+      Properties:
+        QueueName: "Weather"
+        VisibilityTimeout: 30
+        MessageRetentionPeriod: 60
+        RedrivePolicy:
+          deadLetterTargetArn:
+            "Fn::GetAtt":
+              - WeatherDeadLetterQueue
+              - Arn
+          maxReceiveCount: 1
+```
+* And allow functions to access the queue
+```
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - sqs:ReceiveMessage
+        - sqs:SendMessage
+      Resource:
+        - Fn::GetAtt:
+            - WeatherQueue
+            - Arn
+```
 * We will add a new function, called generateList which will set to scheduled at every minute.
-* Then we create a function which generates a list, and inserts messages into SQS.
+```
+def generateList(event:, context:)
+  locationList = [646099,667931,638242,656958,2487956,766273]
+  delay = 0
+
+  locationList.each do |l|
+    sqs_message = { locationId: l}
+    SQS.send_message(queue_url: ENV['SQS_URL'], message_body: sqs_message.to_json, delay_seconds: delay)
+    delay += 10
+  end
+
+  return 'Finished'
+end
+```
+* This function will take care to add messages into a queue
+```
+  generateList:
+    handler: handler.generateList
+    layers:
+      - {Ref: GemLayerLambdaLayer}
+    environment:
+      GEM_PATH: /opt/2.7.0
+      SQS_URL: !Ref WeatherQueue
+    events:
+      - schedule: rate(5 minutes)
+```
 * Our old updateTemperature method will be rewritten to be triggered by SQS.
+```
+def updateTemperature(event:, context:)
+  event['Records'].each do |r|
+    event = JSON.parse(r['body'])
+    locationId = event['locationId']
+    url = "https://www.metaweather.com/api/location/#{locationId}/"
+    resp = HTTParty.get(url).parsed_response
+    temp = resp['consolidated_weather'].first['the_temp'].round(1)
+    resp = DYNAMO_DB.update_item({
+      table_name: 'weather',
+      key: {
+        locationId: locationId
+      },
+      update_expression: 'set temperature = :t',
+      expression_attribute_values: {':t' => temp }
+    })
+    puts resp.inspect
+  end
+  return 'Finished'
+end
+```
+* In the serverless.yml we will use a new event type named `sqs`
+```
+    events:
+      - sqs:
+          arn:
+            Fn::GetAtt:
+              - WeatherQueue
+              - Arn
+          batchSize: 2
+```
+* Through `batchSize: 2` we ensure our function always get two messages at once. could allow us to reduce api requests e.g. by getting two weather values through one api request.
 * Through reservedConcurrency we ensure that no more than x api requests are send concurrently.
-* Through delay in sqs we show a different possibility to care for api limits. 
-* And we introduce local payloads for local testing.
+```
+  updateTemperature:
+    reservedConcurrency: 1
+```
+* Through delay in sqs messages we show a different possibility to care for api limits. Each message would be consumed 10 seconds later and reduce load e.g. to an api service or to a database. For example dynamodb writes are pretty expensive. Through such a pattern we could reduce the load easily.
+```
+SQS.send_message(queue_url: ENV['SQS_URL'], message_body: sqs_message.to_json, delay_seconds: delay)
+delay += 10
+```
+* Now testing a function becomes harder as we need to fake e.g. SQS Payloads
+* Create a new directory `test` and add a `updateTemperature.json` in the folder
+```
+{
+  "Records": [
+    {
+      "body" : "{ \"locationId\": 646099}"
+    },
+    {
+      "body" : "{ \"locationId\": 667931}"
+    }
+  ]
+}
+```
+* You can test with your local payload via
+```
+serverless invoke local -f updateTemperature -p test/updatTemperature.json
+```
 * Let's talk about SQS pricing, how lambda binds to SQS and the costs when you do not have a Dead Letter Queue.
 
 # You are bored?
