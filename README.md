@@ -221,6 +221,8 @@ functions:
     }
   }
 ```
+* Update static/indxex.html with your api gateway address
+* Deploy all via `serverless deploy`
 
 ## Part 6 - Add monitoring to our functions through Cloudwatch / XRay
 * Add tracing to our functions
@@ -245,8 +247,31 @@ provider:
 * Add real weather api call. Sponsored through metaweather api.
 * Get your location id first e.g. "646099" for Düsseldorf [Metaweather API Location search](https://www.metaweather.com/api/location/search/?query=d%C3%BCsseldorf)
 * Api call to get data `https://www.metaweather.com/api/location/646099/`
-* See code example in directory: `part 7`
+```
+#!/bin/ruby
+require 'json'
+require 'httparty'
+
+def temperature(event:, context:)
+  url = 'https://www.metaweather.com/api/location/646099/'
+  resp = HTTParty.get(url).parsed_response
+  temp = resp['consolidated_weather'].first['the_temp'].round(1)
+
+  {
+    statusCode: 200,
+    body: JSON.generate({temperature: temp}),
+    headers: {
+      'Access-Control-Allow-Origin': '*',
+    }
+  }
+end
+```
 * Add httparty to Gemfile
+```
+source 'https://rubygems.org'
+
+gem 'httparty'
+```
 * Add a gem layer to our serverless function
 ```
 layers:
@@ -264,10 +289,9 @@ functions:
 
 * Install gems locally, compiled through docker on linux
 ```
-docker run --rm -it -v $PWD:/var/gem_build -w /var/gem_build lambci/lambda:build-ruby2.5 bundle install --path=.
+# If you get problems during the next step. Just rename directory ruby-layer to ruby. This is a ready directory to use.
+docker run --rm -it -v $PWD:/var/gem_build -w /var/gem_build lambci/lambda:build-ruby2.7 bundle install --path=.
 ```
-
-* If you get problems during this step. For example do not have docker installed. Just rename directory ruby-layer to ruby. This is a ready directory to use.
 
 * Deploy everything
 ```
@@ -275,7 +299,7 @@ serverless deploy
 ```
 
 ## Part 8 - Lets fix response times through dynamodb
-* That are some bad response times. Lets fix this through DynamoDB.
+* We would do a lot of api requests if people would reload page more frequently. Lets fix this through using DynamoDB for caching.
 * Add table in serverless.yml
 ```
     WeatherTable:
