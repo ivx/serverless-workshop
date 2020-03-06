@@ -43,7 +43,7 @@ functions:
     layers:
       - {Ref: GemLayerLambdaLayer}
     environment:
-      GEM_PATH: /opt/2.5.0
+      GEM_PATH: /opt/2.7.0
     events:
     - http:
         path: temperature
@@ -54,7 +54,7 @@ functions:
     layers:
       - {Ref: GemLayerLambdaLayer}
     environment:
-      GEM_PATH: /opt/2.5.0
+      GEM_PATH: /opt/2.7.0
     reservedConcurrency: 1
     events:
       - sqs:
@@ -69,7 +69,7 @@ functions:
     layers:
       - {Ref: GemLayerLambdaLayer}
     environment:
-      GEM_PATH: /opt/2.5.0
+      GEM_PATH: /opt/2.7.0
       SQS_URL: !Ref WeatherQueue
     events:
       - schedule: rate(5 minutes)

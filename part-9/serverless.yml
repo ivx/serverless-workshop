@@ -35,7 +35,7 @@ functions:
     layers:
       - {Ref: GemLayerLambdaLayer}
     environment:
-      GEM_PATH: /opt/2.5.0
+      GEM_PATH: /opt/2.7.0
     events:
     - http:
         path: temperature
@@ -46,7 +46,7 @@ functions:
     layers:
       - {Ref: GemLayerLambdaLayer}
     environment:
-      GEM_PATH: /opt/2.5.0
+      GEM_PATH: /opt/2.7.0
     events:
       - schedule: rate(1 minute)
 
