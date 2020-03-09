@@ -22,7 +22,7 @@ npm update -g serverless
 
 * Create AWS account
 * Log into your account
-* Visit IAM Portal and click Users [IAM Users](https://console.aws.amazon.com/iam/home?region=eu-west-1#/users)
+* Visit [IAM Portal](https://console.aws.amazon.com/iam/home) and click Users [IAM Users](https://console.aws.amazon.com/iam/home?region=eu-west-1#/users)
 * Add user `serverless-cli` and allow `programmatic acccess`
 ![Add user](/img/add-user.png)
 * For simplicity attach existing policy `AdministratorAccess`
