@@ -159,6 +159,51 @@ provider:
 ```
 * Configure plugin - See directory part-4 serverless.yml for details.
 * We add a new root element to the serverless.yml - Resources.
+* We add a custom variable with a siteName (your s3 bucket)
+* We configure which files to upload
+```
+custom:
+  siteName: :FIX_YOUR_BUCKET_NAME:
+
+  s3Sync:
+    - bucketName: ${self:custom.siteName}
+      localDir: static
+
+resources:
+  Outputs:
+    Website:
+      Value: http://${self:custom.siteName}.s3-website.${self:provider.region}.amazonaws.com/
+  Resources:
+    StaticSite:
+      Type: AWS::S3::Bucket
+      Properties:
+        AccessControl: PublicRead
+        BucketName: ${self:custom.siteName}
+        WebsiteConfiguration:
+          IndexDocument: index.html
+    StaticSiteS3BucketPolicy:
+      Type: AWS::S3::BucketPolicy
+      Properties:
+        Bucket:
+          Ref: StaticSite
+        PolicyDocument:
+          Statement:
+            - Sid: PublicReadGetObject
+              Effect: Allow
+              Principal: "*"
+              Action:
+              - s3:GetObject
+              Resource:
+                Fn::Join: [
+                  "", [
+                    "arn:aws:s3:::",
+                    {
+                      "Ref": "StaticSite"
+                    },
+                    "/*"
+                  ]
+                ]
+```
 * Check out [aws resources possibilities](https://serverless.com/framework/docs/providers/aws/guide/resources/).
 
 * Create a `static` directory and add a index.html in the directory
