@@ -271,7 +271,7 @@ functions:
 endpoints:
   GET - https://ns62gxv4s6.execute-api.eu-central-1.amazonaws.com/dev/temperature
 ```
-* Update static/indxex.html with your api gateway address via update-api-gateway script in all workshop folders
+* Update static/index.html with your api gateway address via update-api-gateway script in all workshop folders
 ```
 ./update-api-gateway 3i50ueo3he.execute-api.eu-central-1.amazonaws.com
 ```
@@ -341,7 +341,7 @@ functions:
     layers:
       - {Ref: GemLayerLambdaLayer}
     environment:
-      GEM_PATH: /opt/2.5.0
+      GEM_PATH: /opt/2.7.0
 ```
 
 * Install gems locally, compiled through docker on linux
