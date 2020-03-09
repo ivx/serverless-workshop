@@ -1,0 +1,7 @@
+StaticSite:
+  Type: AWS::S3::Bucket
+  Properties:
+    AccessControl: PublicRead
+    BucketName: ${self:custom.siteName}
+    WebsiteConfiguration:
+      IndexDocument: index.html

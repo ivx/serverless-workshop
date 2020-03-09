@@ -1,11 +1,10 @@
-service: serverless-workshop
+service: ${file(../service.yml)}
 
 provider:
   name: aws
   runtime: ruby2.7
-
-  stage: dev
-  region: eu-central-1
+  stage: live
+  region: ${file(../region.yml)}
 
 functions:
   hello:

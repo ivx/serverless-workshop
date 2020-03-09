@@ -1,13 +1,13 @@
-service: serverless-workshop
+service: ${file(../service.yml)}
 
 plugins:
   - serverless-s3-sync
+
 provider:
   name: aws
   runtime: ruby2.7
-
-  stage: dev
-  region: eu-central-1
+  stage: live
+  region: ${file(../region.yml)}
 
 functions:
   hello:
@@ -18,7 +18,7 @@ functions:
         method: get
 
 custom:
-  siteName: :SERVERLESS-WORKSHOP-S3-BUCKET-PLACEHOLDER:
+  siteName: ${file(../s3-bucket-name.yml)}
 
   s3Sync:
     - bucketName: ${self:custom.siteName}
@@ -29,32 +29,5 @@ resources:
     Website:
       Value: http://${self:custom.siteName}.s3-website.${self:provider.region}.amazonaws.com/
   Resources:
-    StaticSite:
-      Type: AWS::S3::Bucket
-      Properties:
-        AccessControl: PublicRead
-        BucketName: ${self:custom.siteName}
-        WebsiteConfiguration:
-          IndexDocument: index.html
-    StaticSiteS3BucketPolicy:
-      Type: AWS::S3::BucketPolicy
-      Properties:
-        Bucket:
-          Ref: StaticSite
-        PolicyDocument:
-          Statement:
-            - Sid: PublicReadGetObject
-              Effect: Allow
-              Principal: "*"
-              Action:
-              - s3:GetObject
-              Resource:
-                Fn::Join: [
-                  "", [
-                    "arn:aws:s3:::",
-                    {
-                      "Ref": "StaticSite"
-                    },
-                    "/*"
-                  ]
-                ]
+    - ${file(../resource-s3-bucket.yml)}
+    - ${file(../resource-s3-bucket-policy.yml)}
